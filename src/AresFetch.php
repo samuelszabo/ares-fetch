@@ -4,7 +4,6 @@ namespace AresFetch;
 
 use AresFetch\Response\InvalidResponse;
 use AresFetch\Response\NoResultsResponse;
-use AresFetch\Response\OneCompanyResult;
 use AresFetch\Response\ResultInterface;
 use Psr\Http\Client\ClientInterface;
 
@@ -49,9 +48,14 @@ class AresFetch
         }
 
         $responseClass = $request->getResponseClass();
-        /** @var ResultInterface $result */
-        $result = new $responseClass();
-        $result->setResults($data);
+        try {
+            /** @var ResultInterface $result */
+            $result = new $responseClass();
+            $result->setResults($data);
+        } catch (\Throwable $e) {
+            // todo Application log
+            return InvalidResponse::fromException($e);
+        }
         return $result;
     }
 
@@ -65,15 +69,9 @@ class AresFetch
         return [];
     }
 
-    public function searchByCompanyId(string $string): ?OneCompanyResult
+    public function searchByCompanyId(string $string): ResultInterface
     {
         $search = new Request\SearchByCompanyId($string);
-        /** @var OneCompanyResult $result */
-        $result = $this->request($search);
-        if ($result->isSuccess()) {
-            return $result;
-        }
-
-        return null;
+        return $this->request($search);
     }
 }

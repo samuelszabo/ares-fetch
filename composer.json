@@ -33,6 +33,7 @@
     "test": "phpunit",
     "pre-commit": [
       "@cs-fix",
+      "@cs-check",
       "@phpstan",
       "@test"
     ]

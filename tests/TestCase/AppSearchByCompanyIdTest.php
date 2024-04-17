@@ -2,7 +2,6 @@
 
 namespace TestCase;
 
-use AresFetch\Response\OneCompanyResult;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
@@ -13,13 +12,34 @@ class AppSearchByCompanyIdTest extends TestCase
     {
         $jsonError = json_encode([
             'kod' => 'CHYBA_VSTUPU',
-            'popis' => 'Položka \'ico\' : nesplňuje regulární výraz [0-9]{8}|Není vyplněn správný formát IČO. Upravte parametry vyhledávání.|Chyba vstupu',
+            'popis' => 'Položka \'ico\' : nesplňuje regulární výraz [0-9]{8}|' .
+                'Není vyplněn správný formát IČO. Upravte parametry vyhledávání.|Chyba vstupu',
             'subKod' => 'VSTUP_NEVALIDNI_FORMAT_ICO'
         ]);
         $guzzleMock = \Mockery::mock(Client::class);
         $guzzleMock
             ->shouldReceive('sendRequest')
             ->andReturn(new Response(400, [], $jsonError));
+
+        $aresFetch = new \AresFetch\AresFetch([
+            'client' => $guzzleMock,
+        ]);
+
+        $search = new \AresFetch\Request\SearchByCompanyId('ABC');
+        $result = $aresFetch->request($search);
+
+        //assert
+        $this->assertInstanceOf(\AresFetch\Response\InvalidResponse::class, $result);
+        $this->assertFalse($result->isSuccess());
+    }
+
+    public function testNotJsonResponse(): void
+    {
+
+        $guzzleMock = \Mockery::mock(Client::class);
+        $guzzleMock
+            ->shouldReceive('sendRequest')
+            ->andReturn(new Response(200, [], "Some server error"));
 
         $aresFetch = new \AresFetch\AresFetch([
             'client' => $guzzleMock,
@@ -60,6 +80,21 @@ class AppSearchByCompanyIdTest extends TestCase
     }
 
 
+    public function testSearchNotFoundShortForm()
+    {
+        $aresFetch = new \AresFetch\AresFetch([
+            'client' => $this->mockNotFound(),
+        ]);
+
+        $this->assertInstanceOf(\AresFetch\AresFetch::class, $aresFetch);
+        $result = $aresFetch->searchByCompanyId('XXXX');
+
+        $this->assertInstanceOf(\AresFetch\Response\NoResultsResponse::class, $result);
+        $this->assertFalse($result->isSuccess());
+        $this->assertNull($result->getCompany());
+    }
+
+
     public function testSearchByCorrectCompanyIdShortForm()
     {
         $aresFetch = new \AresFetch\AresFetch([
@@ -77,6 +112,21 @@ class AppSearchByCompanyIdTest extends TestCase
         $this->assertSame('01569651', $company->getId());
     }
 
+    public function testReturnInvalidJson()
+    {
+        $aresFetch = new \AresFetch\AresFetch([
+            'client' => $this->mockInvalidJson(),
+        ]);
+
+        $this->assertInstanceOf(\AresFetch\AresFetch::class, $aresFetch);
+        $result = $aresFetch->searchByCompanyId('01569651');
+
+        $this->assertInstanceOf(\AresFetch\Response\InvalidResponse::class, $result);
+        $this->assertFalse($result->isSuccess());
+
+        $this->assertNull($result->getCompany());
+    }
+
     private function mockFound(): Client
     {
         $data = file_get_contents(dirname(__DIR__) . '/data/responses/found_superfaktura.json');
@@ -84,6 +134,27 @@ class AppSearchByCompanyIdTest extends TestCase
         $guzzleMock
             ->shouldReceive('sendRequest')
             ->andReturn(new Response(200, [], $data));
+
+        return $guzzleMock;
+    }
+
+    private function mockInvalidJson(): Client
+    {
+        $data = file_get_contents(dirname(__DIR__) . '/data/responses/invalid_json.json');
+        $guzzleMock = \Mockery::mock(Client::class);
+        $guzzleMock
+            ->shouldReceive('sendRequest')
+            ->andReturn(new Response(200, [], $data));
+
+        return $guzzleMock;
+    }
+
+    private function mockNotFound(): Client
+    {
+        $guzzleMock = \Mockery::mock(Client::class);
+        $guzzleMock
+            ->shouldReceive('sendRequest')
+            ->andReturn(new Response(404, [], '{}'));
 
         return $guzzleMock;
     }

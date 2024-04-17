@@ -6,7 +6,7 @@ use AresFetch\Entity\EntityBuilder;
 
 class OneCompanyResult extends Result
 {
-    private \AresFetch\Entity\Company $company;
+    private ?\AresFetch\Entity\Company $company;
 
     public function isSuccess(): bool
     {
@@ -20,7 +20,7 @@ class OneCompanyResult extends Result
         $this->company = $company;
     }
 
-    public function getCompany(): \AresFetch\Entity\Company
+    public function getCompany(): ?\AresFetch\Entity\Company
     {
         return $this->company;
     }

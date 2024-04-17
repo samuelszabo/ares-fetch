@@ -9,4 +9,6 @@ interface ResultInterface
     public function getResults(): array;
 
     public function setResults(array $results): void;
+
+    public function getCompany(): ?\AresFetch\Entity\Company;
 }

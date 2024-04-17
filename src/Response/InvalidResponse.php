@@ -15,6 +15,15 @@ class InvalidResponse implements ResultInterface
         $this->message = isset($data['popis']) && is_string($data['popis']) ? $data['popis'] : 'Invalid response';
     }
 
+    public static function fromException(\Throwable|\Exception $e): self
+    {
+        return new self([
+            'kod' => 'Exception',
+            'subKod' => $e->getCode(),
+            'popis' => $e->getMessage(),
+        ]);
+    }
+
     public function isSuccess(): bool
     {
         return false;
@@ -42,5 +51,10 @@ class InvalidResponse implements ResultInterface
 
     public function setResults(array $results): void
     {
+    }
+
+    public function getCompany(): ?\AresFetch\Entity\Company
+    {
+        return null;
     }
 }
