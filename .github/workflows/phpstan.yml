@@ -7,7 +7,7 @@ on:
       - '.github/workflows/phpstan.yml'
       - 'phpstan.neon'
     branches:
-      - master
+      - main
   pull_request:
     paths:
       - '**.php'
