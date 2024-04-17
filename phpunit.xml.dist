@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
+         colors="true"
+         bootstrap="tests/bootstrap.php"
+         backupGlobals="true">
+    <testsuites>
+        <testsuite name="ares-fetch">
+            <directory>tests/TestCase/</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <ini name="memory_limit" value="-1"/>
+        <ini name="error_reporting" value="32767"/>
+        <env name="FIXTURE_SCHEMA_METADATA" value="./tests/schema.php"/>
+        <const name="PHPUNIT_TESTSUITE" value="true"/>
+    </php>
+</phpunit>
