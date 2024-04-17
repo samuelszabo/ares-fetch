@@ -25,17 +25,17 @@
   "scripts": {
     "check": [
       "@cs-check",
-      "@test"
+      "@phpunit"
     ],
     "cs-check": "phpcs --colors --parallel=16 -p",
     "cs-fix": "phpcbf --colors --parallel=16 -p",
     "phpstan": "phpstan analyse",
-    "test": "phpunit",
+    "phpunit": "phpunit",
     "pre-commit": [
       "@cs-fix",
       "@cs-check",
       "@phpstan",
-      "@test"
+      "@phpunit"
     ]
   }
 }
