@@ -2,6 +2,9 @@
 
 namespace AresFetch\Request;
 
+use AresFetch\Response\OneCompanyResult;
+use AresFetch\Response\ResultInterface;
+
 class SearchByCompanyId extends Request
 {
     private const string URI = 'https://ares.gov.cz/ekonomicke-subjekty-v-be/rest/ekonomicke-subjekty/';
@@ -15,9 +18,9 @@ class SearchByCompanyId extends Request
         );
     }
 
-    public function getResponseClass(): string
+    public function getResponseClass(): ResultInterface
     {
-        return 'AresFetch\Response\OneCompanyResult';
+        return new OneCompanyResult();
     }
 
     public function getCompanyId(): string

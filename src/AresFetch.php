@@ -47,10 +47,8 @@ class AresFetch
             return new InvalidResponse($data);
         }
 
-        $responseClass = $request->getResponseClass();
+        $result = $request->getResponseClass();
         try {
-            /** @var ResultInterface $result */
-            $result = new $responseClass();
             $result->setResults($data);
         } catch (\Throwable $e) {
             // todo Application log
